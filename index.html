@@ -97,14 +97,14 @@
   }
   .topbar .wrap { display: flex; align-items: center; justify-content: space-between; height: 72px; }
   .logo { display: flex; align-items: center; }
-  .logo-img {
-    height: 34px; width: auto; display: block;
-    background: #fff; border-radius: 9px; padding: 3px 7px;
+  .logo-img { height: 30px; width: auto; display: block; }
+  footer .pw img { height: 26px; width: auto; display: block; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .logo-img,
+    :root:not([data-theme="light"]) footer .pw img { filter: brightness(0) invert(1); }
   }
-  footer .pw img {
-    height: 30px; width: auto; display: block;
-    background: #fff; border-radius: 9px; padding: 3px 7px;
-  }
+  :root[data-theme="dark"] .logo-img,
+  :root[data-theme="dark"] footer .pw img { filter: brightness(0) invert(1); }
   .nav-cta {
     font: 600 0.82rem/1 "Poppins", sans-serif; text-decoration: none; color: #fff;
     background: linear-gradient(135deg, var(--accent), var(--accent-bright));
