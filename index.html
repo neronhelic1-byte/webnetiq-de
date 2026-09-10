@@ -9,6 +9,7 @@
 <meta property="og:title" content="webnetiq — Kostenlose Website-Demo" />
 <meta property="og:description" content="Wir bauen Ihre neue Website zuerst. Kostenlos. Dann entscheiden Sie." />
 <meta property="og:type" content="website" />
+<meta property="og:url" content="https://webnetiq.de/" />
 <meta name="description" content="Kostenlose professionelle Website für Ihr Unternehmen &mdash; zur Vorschau. Erst sehen, dann zahlen." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -386,6 +387,8 @@
     cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px;
   }
   .secondary-row button:hover { background: var(--surface-2); }
+  .secondary-row button:focus-visible { outline: 3px solid var(--accent-soft); outline-offset: 2px; }
+  .secondary-row button.done { color: var(--good); border-color: var(--good); }
 
   .card h5 {
     font-family: "IBM Plex Mono", monospace; font-size: 0.7rem; letter-spacing: 0.08em;
@@ -525,7 +528,6 @@
     .demo__send { flex-direction: column; }
   }
   </style>
-
   <style>
     :root { color-scheme: light dark; }
     * { box-sizing: border-box; }
@@ -737,13 +739,9 @@
           <a class="btn" href="#demo-form">Das will ich!</a>
 
           <div class="secondary-row">
-            <button type="button">
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M8 3.5s-1.2-2-3.2-2C2.7 1.5 1.5 3 1.5 4.7c0 3 4.3 6 6.5 7.8 2.2-1.8 6.5-4.8 6.5-7.8C14.5 3 13.3 1.5 11.2 1.5 9.2 1.5 8 3.5 8 3.5Z"/></svg>
-              Merken
-            </button>
-            <button type="button">
+            <button type="button" id="shareBtn">
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="4" cy="8" r="1.6"/><circle cx="12" cy="4" r="1.6"/><circle cx="12" cy="12" r="1.6"/><path d="M5.4 7.1 10.6 4.7M5.4 8.9l5.2 2.4"/></svg>
-              Teilen
+              <span>Seite teilen</span>
             </button>
           </div>
         </div>
@@ -831,6 +829,48 @@
 
 <script>
 (function () {
+  var shareBtn = document.getElementById('shareBtn');
+  if (shareBtn) {
+    var shareLabel = shareBtn.querySelector('span');
+    var defaultLabel = shareLabel ? shareLabel.textContent : '';
+    shareBtn.addEventListener('click', function () {
+      var url = window.location.href.split('#')[0];
+      var data = {
+        title: 'webnetiq – Kostenlose Website-Demo',
+        text: 'Kostenlose Website-Demo für dein Unternehmen – erst sehen, dann entscheiden.',
+        url: url
+      };
+      if (navigator.share) {
+        navigator.share(data).catch(function () {});
+        return;
+      }
+      var flash = function (msg) {
+        if (!shareLabel) return;
+        shareLabel.textContent = msg;
+        shareBtn.classList.add('done');
+        setTimeout(function () {
+          shareLabel.textContent = defaultLabel;
+          shareBtn.classList.remove('done');
+        }, 2200);
+      };
+      var legacyCopy = function () {
+        var ta = document.createElement('textarea');
+        ta.value = url; ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        var ok = false;
+        try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+        document.body.removeChild(ta);
+        if (ok) { flash('Link kopiert \u2713'); }
+        else { window.prompt('Link zum Teilen kopieren:', url); }
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(function () { flash('Link kopiert \u2713'); }, legacyCopy);
+      } else {
+        legacyCopy();
+      }
+    });
+  }
+
   var form = document.getElementById('demoForm');
   if (!form) return;
   var err = document.getElementById('demoErr');
